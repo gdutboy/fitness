@@ -10,6 +10,6 @@
     "dev": "node serve.js"
   },
   "devDependencies": {
-    "jsdom": "^31.1.0"
+    "jsdom": "^31.0.0"
   }
 }
