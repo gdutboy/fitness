@@ -13,7 +13,7 @@ async function backend(t){
  const dir=await mkdtemp(path.join(os.tmpdir(),'fitness-test-')),route=createFitnessRoute(dir);
  const server=http.createServer(async(req,res)=>{const [code,body]=await route(req);res.writeHead(code,{'Content-Type':'application/json'}).end(JSON.stringify(body));});
  await new Promise(r=>server.listen(0,'127.0.0.1',r));
- t.after(async()=>{await new Promise(r=>server.close(r));await rm(dir,{recursive:true,force:true});});
+ t.after(async()=>{await new Promise(r=>{server.close(r);server.closeAllConnections();});await rm(dir,{recursive:true,force:true});});
  const url=`http://127.0.0.1:${server.address().port}/v1/fitness/data`;
  return {dir,url,get:async()=>fetch(url).then(r=>r.json()),put:async(data,baseRev)=>fetch(url,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({data,baseRev})})};
 }
@@ -84,5 +84,5 @@ test('a second tab reloads the shared baseline instead of resurrecting undone re
 test('oversized request returns 413 without replacing stored data',async t=>{
  const b=await backend(t);await b.put(freshState(),0);
  const response=await fetch(b.url,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:'x'.repeat(3*1024*1024)})});
- assert.equal(response.status,413);assert.equal((await b.get()).rev,1);
+ assert.equal(response.status,413);assert.equal((await response.json()).error,'Data too large');assert.equal((await b.get()).rev,1);
 });
