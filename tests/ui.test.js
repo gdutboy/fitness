@@ -9,7 +9,7 @@ const html=await readFile(new URL('../index.html',import.meta.url),'utf8');
 const source=(await readFile(new URL('../app.js',import.meta.url),'utf8')).replace(/^import .*?;\n/gm,'');
 function app(t,route='today',raw=null){
  const dom=new JSDOM(html,{url:`https://fitness.test/fitness/#${route}`,runScripts:'outside-only'}),w=dom.window,errors=[];
- Object.assign(w,core,{recipeById:data.recipeById,moves:data.moves,structuredClone});
+ Object.assign(w,core,{createSync:()=>({sync:async()=>{},changed:()=>{}}),recipeById:data.recipeById,moves:data.moves,structuredClone});
  w.scrollTo=()=>{};
  w.HTMLDialogElement.prototype.showModal=function(){this.open=true;};
  w.HTMLDialogElement.prototype.close=function(){this.open=false;this.dispatchEvent(new w.Event('close'));};

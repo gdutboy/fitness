@@ -3,3 +3,4 @@ node_modules/
 coverage/
 *.local.*
 _site/
+.fitness-test-data/
